@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "userConfig": {
+      "title": "UserConfig",
+      "description": "Messenger and AI config for the client",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The Firebase Auth UID of the user" },
+        "pageId": { "type": "string", "description": "Facebook Page ID" },
+        "appSecret": { "type": "string", "description": "Facebook App Secret" },
+        "pageAccessToken": { "type": "string", "description": "Facebook Page Access Token" },
+        "verifyToken": { "type": "string", "description": "Facebook Webhook Verification Token" },
+        "botActive": { "type": "boolean", "description": "Is the automatic AI replier active" },
+        "selectedPersonaId": { "type": "string", "description": "ID of the selected AI persona" },
+        "customPersonaName": { "type": "string", "description": "Custom AI Persona Name if 6th selected" },
+        "customPersonaPrompt": { "type": "string", "description": "Custom AI Persona Prompt/Tone instructions" },
+        "businessDetails": { "type": "string", "description": "Textual business details for AI context" },
+        "uploadedFiles": { "type": "array", "description": "Uploaded documents containing additional context" }
+      },
+      "required": ["userId", "botActive", "selectedPersonaId"]
+    },
+    "conversation": {
+      "title": "Conversation",
+      "description": "An active chat session with a customer via Facebook Messenger",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Facebook PSID (Page-scoped ID)" },
+        "customerName": { "type": "string", "description": "Name of the Facebook customer" },
+        "customerPic": { "type": "string", "description": "URL of the Facebook customer profile picture" },
+        "lastMessageText": { "type": "string", "description": "Content of the last message received or sent" },
+        "lastMessageTime": { "type": "number", "description": "Timestamp of the last message" },
+        "status": { "type": "string", "description": "Status of the conversation: active, archived, etc" },
+        "isUnderHandover": { "type": "boolean", "description": "True if human agent has taken control (AI bot is paused for this customer)" },
+        "updatedAt": { "type": "number", "description": "Last updated epoch timestamp" }
+      },
+      "required": ["id", "isUnderHandover", "updatedAt"]
+    },
+    "chatMessage": {
+      "title": "ChatMessage",
+      "description": "A message within a conversation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique message ID" },
+        "text": { "type": "string", "description": "Text content of the message" },
+        "sender": { "type": "string", "description": "Either 'bot', 'customer', or 'human'" },
+        "timestamp": { "type": "number", "description": "Timestamp of the message" }
+      },
+      "required": ["id", "text", "sender", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "userConfig",
+      "description": "Configurations for client user"
+    },
+    "users/{userId}/conversations/{psid}": {
+      "schema": "conversation",
+      "description": "Active customer conversations and handover state"
+    },
+    "users/{userId}/conversations/{psid}/messages/{messageId}": {
+      "schema": "chatMessage",
+      "description": "Individual messages in a specific conversation"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if ID is a valid string of acceptable length and characters
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId && isValidId(userId);
+
+      match /conversations/{psid} {
+        allow read, write: if request.auth != null && request.auth.uid == userId && isValidId(psid);
+
+        match /messages/{messageId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId && isValidId(messageId);
+        }
+      }
+    }
+  }
+}
